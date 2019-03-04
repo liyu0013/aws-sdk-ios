@@ -28,10 +28,10 @@ def getfailedcases():
 
 
  #run test   
-def runtest(otherargments, timeout = 0):
+def runtest(otherargments, projectPath, schemeName, projectName, destination, derivedDataPath, timeout = 0):
     runcommand("rm raw.log")
     runcommand("rm xcpretty.log")
-    testcommand = "xcodebuild   test-without-building  -project AWSiOSSDKv2.xcodeproj -scheme AWSAllTests -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 8,OS=12.1'" 
+    testcommand = "xcodebuild   test-without-building  -project {0} -scheme {1} -sdk iphonesimulator -destination '{2}'  -derivedDataPath  {3}/{4}".format(projectPath,schemeName, destination, derivedDataPath, projectName) 
     testcommand +=" " +  otherargments;
     rawoutput = open('raw.log','w')
     exit_code = runcommand(testcommand,timeout, pipeout = rawoutput)
@@ -46,12 +46,15 @@ def runtest(otherargments, timeout = 0):
 # a command will like 
 
 if (len(sys.argv) < 3 or sys.argv[1] == '-h' or sys.argv[1] == '-h') : 
-    print("Usage: \r\n {0} <integrationTestsConfiguration json file path> <test result location>".format(sys.argv[0])) ;
+    print("Usage: \r\n {0} <integrationTestsConfiguration json file path> <test result location> <group name>".format(sys.argv[0])) ;
     exit(1)
 
 
 jsonfilename=sys.argv[1]
 test_result_folder=sys.argv[2]
+group_name = sys.argv[3]
+destination = sys.argv[4]
+derivedDataPath = sys.argv[5]
 
 with open(jsonfilename, 'r') as jsonfile:
     jsonstring = jsonfile.read()
@@ -59,20 +62,24 @@ with open(jsonfilename, 'r') as jsonfile:
 testConfigure =  demjson.decode(jsonstring)
 runningConfigure = testConfigure['runningConfigure']
 projectName = runningConfigure['projectName']
+projectPath = runningConfigure['projectPath']
 schemeName = runningConfigure['schemeName']
 sdkName = runningConfigure['sdkName']
-paltformName = runningConfigure['paltformName']
-deviceName = runningConfigure['deviceName']
-osVersion = runningConfigure['osVersion']
+ 
 
-buildcommand = f"xcodebuild  build-for-testing -project {projectName} -scheme {schemeName} -sdk {sdkName} -destination 'platform={paltformName},name={deviceName},OS={osVersion}'"      
-exit_code = runcommand(buildcommand)
-if(exit_code != 0):
-    exit(exit_code)  
+print("group name:", group_name)
+testgroup = testConfigure[group_name]
+testlist = testgroup['test_list']
+if 'projectName' in testgroup.keys() :
+    projectName = testgroup['projectName']
+if 'projectPath' in testgroup.keys():
+    projectPath = testgroup['projectPath']
+if 'schemeName' in testgroup.keys():
+    schemeName = testgroup['schemeName']
 
-testlist = testConfigure['testList']
-testcommandhead = f"xcodebuild   test-without-building  -project {projectName} -scheme {schemeName} -sdk {sdkName} -destination 'platform={paltformName},name={deviceName},OS={osVersion}'"
-testcommandtail = "    | tee raw.log  | xcpretty -r junit | tee xcpretty.log"
+print("projectName, projectPath, schemeName", projectName, projectPath, schemeName)
+# testcommandhead = f"xcodebuild   test-without-building  -project {projectName} -scheme {schemeName} -sdk {sdkName} -destination 'platform={paltformName},name={deviceName},OS={osVersion}'"
+# testcommandtail = "    | tee raw.log  | xcpretty -r junit | tee xcpretty.log"
 for testname in testlist:
 
     print("-------------------------------", testname , "-------------------------------");
@@ -85,7 +92,7 @@ for testname in testlist:
         for skipingtest in test['skipingtests']:
             skipingtests += ' -skip-testing:' + testname+ "/" + skipingtest
 
-    exit_code = runtest(testarguments + skipingtests)
+    exit_code = runtest(testarguments + skipingtests, projectPath, schemeName, projectName, destination, derivedDataPath)
     print(testname, "exit code:", exit_code)
     # if test fails, check if the failed tests can be retried
     if exit_code != 0:
@@ -122,7 +129,7 @@ for testname in testlist:
                 for failed in faileds:
                     testarguments += ' -only-testing:' + failed
                 retrytimes += 1
-                exit_code = runtest(testarguments, timeout);
+                exit_code = runtest(testarguments,projectPath, schemeName, projectName, destination, derivedDataPath);
                 print("retry exit code:", exit_code)                
                 if(exit_code != 0 ):
                     faileds = getfailedcases()

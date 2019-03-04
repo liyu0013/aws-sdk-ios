@@ -1,6 +1,7 @@
 {
 	'runningConfigure' : { 
-		'projectName' : "AWSiOSSDKv2.xcodeproj" ,
+		'projectName' : "AWSiOSSDKv2" ,
+		'projectPath' : "AWSiOSSDKv2.xcodeproj" ,
 		'schemeName' : "AWSAllTests",
 		'sdkName' : "iphonesimulator",
 		'paltformName' : "iOS Simulator",
@@ -8,7 +9,54 @@
 		'osVersion' : "12.1"
 	} ,
 
-	'testList' : { 
-    	'AWSSQSTests':{ }
-    }
+	'SQS' : { 
+		'test_list' : {
+    		'AWSSQSTests':{ }			
+		}
+    },
+    'AWSMobileClient' : { 
+		'test_list' : {
+			'AWSMobileClientTests':{ }	
+		},		
+		'projectName' : 'AWSAuthSDK' ,
+		'projectPath' : 'AWSAuthSDK/AWSAuthSDK.xcodeproj',
+		'schemeName' : 'AWSMobileClient',
+	},
+
+	'unstable_testList1' : { 
+		'AWSMobileAnalyticsLegacyTests':{ },
+		'AWSMobileAnalyticsTests':{ },
+		'AWSRekognitionTests':{ },
+		'AWSSESTests':{ },
+		'AWSSNSTests':{ },
+		'AWSSimpleDBTests':{ },
+		'AWSTranscribeTests':{ },
+		'AWSTranslateTests':{ },
+		'AWSAPIGatewayTests':{ },
+		'AWSAutoScalingTests':{ },
+		'AWSCloudWatchTests':{ },
+		'AWSCognitoAuthTests':{ },
+		'AWSCognitoIdentityProviderTests':{ },
+		'AWSCognitoTests':{ },
+		'AWSComprehendTests':{ },
+		'AWSCoreTests':{ },
+		'AWSEC2Tests':{ },
+		'AWSElasticLoadBalancingTests':{ },
+		'AWSKMSTests':{ },
+		'AWSKinesisTests':{ },
+		'AWSKinesisVideoArchivedMediaTests':{ },
+		'AWSKinesisVideoTests':{ },
+		'AWSLambdaTests':{ },
+		'AWSLexTests':{ },		
+    } ,
+	'unstable_testList2' : { 
+		'AWSIoTTests':{ },		
+		'AWSMachineLearningTests':{ },		
+		'AWSPinpointTests':{ },
+		'AWSS3Tests':{ },		
+		'AWSPollyTests':{ },		
+		'AWSDynamoDBTests':{ },		
+    } ,
+
+
 }
